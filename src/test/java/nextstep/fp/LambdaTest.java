@@ -32,20 +32,36 @@ public class LambdaTest {
     }
 
     @Test
-    public void sumAll() throws Exception {
-        int sum = Lambda.sumAll(numbers);
-        assertThat(sum).isEqualTo(21);
+    public void sumAllLambda() throws Exception {
+        //sumAll
+        int sumAll = Lambda.sumLambda(numbers, number -> true);
+        assertThat(sumAll).isEqualTo(21);
+
+        //sumAllEven
+        int sumAllEven = Lambda.sumLambda(numbers, number -> number % 2 == 0);
+        assertThat(sumAllEven).isEqualTo(12);
+
+        //sumAllOverThree
+        int sumAllOverThree = Lambda.sumLambda(numbers, number -> number > 3);
+        assertThat(sumAllOverThree).isEqualTo(15);
     }
 
-    @Test
-    public void sumAllEven() throws Exception {
-        int sum = Lambda.sumAllEven(numbers);
-        assertThat(sum).isEqualTo(12);
-    }
 
-    @Test
-    public void sumAllOverThree() throws Exception {
-        int sum = Lambda.sumAllOverThree(numbers);
-        assertThat(sum).isEqualTo(15);
-    }
+//    @Test
+//    public void sumAll() throws Exception {
+//        int sum = Lambda.sumAll(numbers);
+//        assertThat(sum).isEqualTo(21);
+//    }
+//
+//    @Test
+//    public void sumAllEven() throws Exception {
+//        int sum = Lambda.sumAllEven(numbers);
+//        assertThat(sum).isEqualTo(12);
+//    }
+//
+//    @Test
+//    public void sumAllOverThree() throws Exception {
+//        int sum = Lambda.sumAllOverThree(numbers);
+//        assertThat(sum).isEqualTo(15);
+//    }
 }
