@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Participant {
+public class Participant {
 
     protected List<Card> pCards = new ArrayList<>();
     protected int totalNum = 0;
@@ -64,12 +64,7 @@ public abstract class Participant {
     }
 
     public void addProfit(int amount) {
-        profit += amount;
-    }
-
-    public String getCardStr() {
-        Card card = pCards.get(0);
-        return card.getNum() + card.getSuit();
+        this.profit += amount;
     }
 
     public String getAllCardsStr() {
@@ -90,6 +85,7 @@ public abstract class Participant {
         totalNum = pCards.stream()
                 .mapToInt(Card::getNum)
                 .sum();
+
         return totalNum;
     }
 
