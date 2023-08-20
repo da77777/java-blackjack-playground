@@ -27,7 +27,7 @@ public class Game {
     public void playGame(Participants ps) {
         checkBlackjack(ps);
         if(ps.getDealer().isBlackjack()) { //딜러 블랙잭이면 게임 종료
-            modProfitByDealerBlackjack(ps);
+            modProfitByPlayerNonBlackjack(ps);
             return;
         }
 
@@ -42,7 +42,7 @@ public class Game {
         modProfit(ps);
     }
 
-    public void checkUnderNum(Participants ps) {
+    private void checkUnderNum(Participants ps) {
         pStatus.checkDealerUnderMin(ps.getDealer());
         pStatus.checkPlayerUnderMax(ps.getPlayers());
     }
@@ -58,49 +58,67 @@ public class Game {
         ps.getPlayers().stream().forEach(pStatus::checkBust);
     }
 
-    public void modProfitByDealerBlackjack(Participants ps) {
-        int betSumNonBlackjack = modProfitByStatus(ps.getPlayers(), p -> !p.isBlackjack(), 1.5, bet -> -bet);
-        ps.getDealer().addProfit(betSumNonBlackjack);
-    }
-
-    public void modProfitByDealerBust(Participants ps) {
-        List<Player> players = ps.getPlayers();
-        int betSumBust = modProfitByStatus(players, p -> p.isBust(), 1.0, bet -> -bet);
-        int betSumNonBust = modProfitByStatus(players, p -> !p.isBust(), 1.0, bet -> bet);
-
-        ps.getDealer().addProfit( betSumBust - betSumNonBust);
-    }
-
     public void modProfit(Participants ps) {
-        Dealer dealer = ps.getDealer();
-        List<Player> players = ps.getPlayers();
-
         //딜러 블랙잭 아니면 -betSumBlackjack
-        if(!dealer.isBlackjack()) {
-            int betSumBlackjack = modProfitByStatus(players, p -> p.isBlackjack(), 1.5, bet -> bet);
-            dealer.addProfit( -betSumBlackjack);
+        if(!ps.getDealer().isBlackjack()) {
+            modProfitByPlayerBlackjack(ps);
         }
 
         //bust 된 플레이어
-        int betSumBust = modProfitByStatus(players, p -> p.isBust(), 1.0, bet -> -bet);
-        //딜러 무조건 +betSum
-        dealer.addProfit(betSumBust);
+        modProfitByPlayerBust(ps);
 
         //블랙잭도, bust 도 아닌 경우
-        int dTotalNum = dealer.getTotalNum();
+        modProfitByNum(ps);
+    }
+
+
+    public void modProfitByPlayerNonBlackjack(Participants ps) {
+        int betSumNonBlackjack = modProfitByStatus(ps.getPlayers(), p -> !p.isBlackjack(), 1.0, bet -> -bet);
+        ps.getDealer().addProfit(betSumNonBlackjack);
+    }
+
+    private void modProfitByPlayerBlackjack(Participants ps) {
+        int betSumBlackjack = modProfitByStatus(ps.getPlayers(), p -> p.isBlackjack(), 1.5, bet -> bet);
+        ps.getDealer().addProfit( -betSumBlackjack);
+    }
+
+    public void modProfitByDealerBust(Participants ps) {
+        modProfitByPlayerNonBust(ps);
+        modProfitByPlayerBust(ps);
+    }
+
+    private void modProfitByPlayerNonBust(Participants ps) {
+        int betSumNonBust = modProfitByStatus(ps.getPlayers(), p -> !p.isBust(), 1.0, bet -> bet);
+        ps.getDealer().addProfit( -betSumNonBust);
+    }
+
+    private void modProfitByPlayerBust(Participants ps) {
+        int betSumBust = modProfitByStatus(ps.getPlayers(), p -> p.isBust(), 1.0, bet -> -bet);
+        ps.getDealer().addProfit( betSumBust);
+    }
+
+    public void modProfitByNum(Participants ps) {
         List<Player> normalPlayers = ps.getPlayers().stream()
                 .filter(p -> !p.isBlackjack() && !p.isBust())
                 .collect(Collectors.toList());
 
-        int betSumWin = modProfitByStatus(normalPlayers, p -> p.getTotalNum() > dTotalNum, 1.0, bet -> bet);
-        int betSumLose = modProfitByStatus(normalPlayers, p -> p.getTotalNum() < dTotalNum, 1.0, bet -> -bet);
+        modProfitByPlayerNumWin(normalPlayers, ps.getDealer());
+        modProfitByPlayerNumLose(normalPlayers, ps.getDealer());
+    }
 
-        dealer.addProfit( -betSumWin + betSumLose);
+    private void modProfitByPlayerNumWin(List<Player> players, Dealer dealer) {
+        int betSumWin = modProfitByStatus(players, p -> p.getTotalNum() > dealer.getTotalNum(), 1.0, bet -> bet);
+        dealer.addProfit( -betSumWin);
+    }
+
+    private void modProfitByPlayerNumLose(List<Player> players, Dealer dealer) {
+        int betSumLose = modProfitByStatus(players, p -> p.getTotalNum() < dealer.getTotalNum(), 1.0, bet -> -bet);
+        dealer.addProfit( betSumLose);
     }
 
     //Predicate <T> : T 타입을 받아서 boolean 을 리턴하는 함수 인터페이스
     //Function<T, R> : T 타입을 받아서 R 타입을 리턴하는 함수 인터페이스
-    public int modProfitByStatus(List<Player> players, Predicate<Player> status, double multiple, Function<Integer, Integer> modifier) {
+    private int modProfitByStatus(List<Player> players, Predicate<Player> status, double multiple, Function<Integer, Integer> modifier) {
         return players.stream()
                 .filter(status)
                 .map(p -> {
