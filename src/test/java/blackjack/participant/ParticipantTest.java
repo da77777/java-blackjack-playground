@@ -7,7 +7,6 @@ import nextstep.blackjack.participants.domain.Dealer;
 import nextstep.blackjack.participants.domain.Participants;
 import nextstep.blackjack.participants.domain.Player;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -39,22 +38,17 @@ public class ParticipantTest {
 
     @ParameterizedTest
     @CsvSource(value = {"1, true, 20", "2, true, 21", "3, true, 12"})
-    void make_nonBust(int num, boolean expected, int totalNum) {
+    void makeNonBust(int num, boolean expected, int totalNum) {
         Player p = ps.getPlayers().get(0);
-        p.addFirstCards(drawCards(SuitEnum.SPADE, 8, 1));
+        p.addFirstCards(Arrays.asList(
+                new Card(SuitEnum.SPADE.getSuit(), 8),
+                new Card(SuitEnum.SPADE.getSuit(), AlphabetEnum.A.getNum(), AlphabetEnum.A.getAlphabet())));
         p.addCard(new Card(SuitEnum.HEART.getSuit(), num));
 
         p.makeNumMax();
 
         assertThat(p.getTotalNum() <= 21).isEqualTo(expected);
         assertThat(p.getTotalNum()).isEqualTo(totalNum);
-    }
-
-    public List<Card> drawCards(SuitEnum suitEnum, int num1, int num2) {
-        if(num2 == A_NUM) {
-            return Arrays.asList(new Card(suitEnum.getSuit(), num1), new Card(suitEnum.getSuit(), AlphabetEnum.A.getNum(), AlphabetEnum.A.getAlphabet()));
-        }
-        return Arrays.asList(new Card(suitEnum.getSuit(), num1), new Card(suitEnum.getSuit(), num2));
     }
 
 }

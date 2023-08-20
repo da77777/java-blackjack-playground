@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 public class GameTestBlackjack {
 
     private static final int P0_BET = 100;
@@ -52,15 +53,15 @@ public class GameTestBlackjack {
 
         game.checkBlackjack(ps);
         if(ps.getDealer().isBlackjack()) { //딜러 블랙잭이면 게임 종료
-            game.modProfitByDealerBlackjack(ps);
+            game.modProfitByPlayerNonBlackjack(ps);
         }
 
-        assertThat(ps.getDealer().getProfit()).isEqualTo(multiplyOPF(P0_BET + P1_BET + P2_BET + P3_BET + P4_BET));
-        assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( -multiplyOPF(P0_BET));
-        assertThat(ps.getPlayers().get(1).getProfit()).isEqualTo( -multiplyOPF(P1_BET));
-        assertThat(ps.getPlayers().get(2).getProfit()).isEqualTo( -multiplyOPF(P2_BET));
-        assertThat(ps.getPlayers().get(3).getProfit()).isEqualTo( -multiplyOPF(P3_BET));
-        assertThat(ps.getPlayers().get(4).getProfit()).isEqualTo( -multiplyOPF(P4_BET));
+        assertThat(ps.getDealer().getProfit()).isEqualTo(P0_BET + P1_BET + P2_BET + P3_BET + P4_BET);
+        assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( -P0_BET);
+        assertThat(ps.getPlayers().get(1).getProfit()).isEqualTo( -P1_BET);
+        assertThat(ps.getPlayers().get(2).getProfit()).isEqualTo( -P2_BET);
+        assertThat(ps.getPlayers().get(3).getProfit()).isEqualTo( -P3_BET);
+        assertThat(ps.getPlayers().get(4).getProfit()).isEqualTo( -P4_BET);
     }
 
     void drawCard_blackjackD() {
@@ -82,15 +83,15 @@ public class GameTestBlackjack {
 
         game.checkBlackjack(ps);
         if(ps.getDealer().isBlackjack()) {
-            game.modProfitByDealerBlackjack(ps);
+            game.modProfitByPlayerNonBlackjack(ps);
         }
 
-        assertThat(ps.getDealer().getProfit()).isEqualTo(multiplyOPF(P1_BET + P2_BET + P3_BET + P4_BET));
+        assertThat(ps.getDealer().getProfit()).isEqualTo(P1_BET + P2_BET + P3_BET + P4_BET);
         assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( ZERO);
-        assertThat(ps.getPlayers().get(1).getProfit()).isEqualTo( -multiplyOPF(P1_BET));
-        assertThat(ps.getPlayers().get(2).getProfit()).isEqualTo( -multiplyOPF(P2_BET));
-        assertThat(ps.getPlayers().get(3).getProfit()).isEqualTo( -multiplyOPF(P3_BET));
-        assertThat(ps.getPlayers().get(4).getProfit()).isEqualTo( -multiplyOPF(P4_BET));
+        assertThat(ps.getPlayers().get(1).getProfit()).isEqualTo( -P1_BET);
+        assertThat(ps.getPlayers().get(2).getProfit()).isEqualTo( -P2_BET);
+        assertThat(ps.getPlayers().get(3).getProfit()).isEqualTo( -P3_BET);
+        assertThat(ps.getPlayers().get(4).getProfit()).isEqualTo( -P4_BET);
     }
 
     void drawCard_blackjackDP() {
@@ -111,7 +112,7 @@ public class GameTestBlackjack {
         drawCard_blackjackP();
 
         game.checkBlackjack(ps);
-        game. modProfit(ps);
+        game.modProfit(ps);
 
         assertThat(ps.getDealer().getProfit()).isEqualTo( -(multiplyOPF(P0_BET) + P1_BET + P4_BET) + P3_BET);
         assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( multiplyOPF(P0_BET));
@@ -203,7 +204,7 @@ public class GameTestBlackjack {
         drawCard_bustP();
 
         game.checkBust(ps);
-        game. modProfit(ps);
+        game.modProfit(ps);
 
         assertThat(ps.getDealer().getProfit()).isEqualTo( -(P1_BET + P4_BET) + (P0_BET + P3_BET));
         assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( -P0_BET);
@@ -234,7 +235,7 @@ public class GameTestBlackjack {
 
         game.checkBlackjack(ps);
         game.checkBust(ps);
-        game.modProfit(ps);
+        game.modProfitByNum(ps);
 
         assertThat(ps.getDealer().getProfit()).isEqualTo( -(P0_BET) + (P1_BET + P2_BET + P3_BET));
         assertThat(ps.getPlayers().get(0).getProfit()).isEqualTo( P0_BET);

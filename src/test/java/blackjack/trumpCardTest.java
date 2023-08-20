@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
-public class trumpCardTest {
+public class TrumpCardTest {
     TrumpCard trumpCard = TrumpCard.getInstance();
 
     @BeforeEach
