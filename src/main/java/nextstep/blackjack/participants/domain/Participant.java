@@ -4,6 +4,7 @@ import nextstep.blackjack.card.domain.Card;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Participant {
@@ -34,25 +35,12 @@ public class Participant {
         return bust;
     }
 
-    //카드 가져오기
     public void addFirstCards(List<Card> cards) {
         pCards.addAll(cards);
     }
 
     public void addCard(Card card) {
         pCards.add(card);
-    }
-
-    public List<Card> pickAceCards() {
-        return pCards.stream()
-                .filter(card -> "A".equals(card.getAlphabet()))
-                .collect(Collectors.toList());
-    }
-
-    public List<Card> pickNormalCards() {
-        return pCards.stream()
-                .filter(card -> !"A".equals(card.getAlphabet()))
-                .collect(Collectors.toList());
     }
 
     public void modIsBlackjack(boolean blackjack) {
@@ -67,17 +55,12 @@ public class Participant {
         this.profit += amount;
     }
 
-    public String getAllCardsStr() {
-        return pCards.stream()
-                .map(c -> c.getNum() + c.getSuit())
-                .collect(Collectors.joining(", "));
-    }
-
     public int makeNumMax() {
-        List<Card> normalCards = pickNormalCards();
-        List<Card> aceCards = pickAceCards();
+        Map<Boolean, List<Card>> cardGroupByAce = separateAceCards();
+        List<Card> normalCards = cardGroupByAce.getOrDefault(false, new ArrayList<>());
+        List<Card> aceCards = cardGroupByAce.getOrDefault(true, new ArrayList<>());
 
-        int normalNum = normalCards.stream().mapToInt(n -> n.getNum()).sum();
+        int normalNum = normalCards.stream().mapToInt(Card::getNum).sum();
         if(!aceCards.isEmpty() && normalNum <= 10) {
             aceCards.get(0).setAceCardNum(11);
         }
@@ -88,6 +71,18 @@ public class Participant {
 
         return totalNum;
     }
+
+    private Map<Boolean, List<Card>> separateAceCards() {
+        return pCards.stream().collect(Collectors.groupingBy(c -> "A".equals(c.getAlphabet())));
+    }
+
+    public String getAllCardsStr() {
+        return pCards.stream()
+                .map(c -> c.getNum() + c.getSuit())
+                .collect(Collectors.joining(", "));
+    }
+
+
 
 
 }

@@ -49,7 +49,6 @@ public class Game {
 
     public void checkBlackjack(Participants ps) {
         pStatus.checkBlackjack(ps.getDealer());
-        //이중 콜론 : 람다식에서 사용 가능. p -> pStatus.checkBlackjack(p) 를 아래와 같이 쓸 수 있다. 인스턴스::메서드
         ps.getPlayers().stream().forEach(pStatus::checkBlackjack);
     }
 
@@ -121,12 +120,12 @@ public class Game {
     private int modProfitByStatus(List<Player> players, Predicate<Player> status, double multiple, Function<Integer, Integer> modifier) {
         return players.stream()
                 .filter(status)
-                .map(p -> {
+                .mapToInt(p -> {
                     int bet = (int) (p.getBet() * multiple);
                     p.addProfit( modifier.apply(bet));
                     return bet;
                 })
-                .reduce(0, Integer::sum);
+                .sum();
     }
 
 }
